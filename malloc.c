@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>           /* For O_* constants */
+#include <sys/stat.h>        /* For mode constants */
+#include <semaphore.h>
+
+#include <sys/mman.h>	/* for PROT_WRITE/PROT_READ, MAP_SHARED, munmap/mmap, shm_open/shm_unlink */
+#include <sys/stat.h>	/* For mode constants */
+#include <sys/wait.h>
+#include <fcntl.h>
 
 //linked list to track freed, previously allocated blocks.
 struct list_entry {
@@ -16,6 +24,7 @@ static const size_t overhead = sizeof(size_t);
 static const size_t align_to = 16;
 
 void* my_malloc(size_t size) {
+
     //ceiling-round size+sizeof(size_t) to the nearest multiple of align_to
     size = (size + sizeof(size_t) + (align_to - 1)) & ~ (align_to - 1);
     list_entry_t* block = free_block_list_head.next;
@@ -44,6 +53,7 @@ void free(void* ptr) {
 
 
 int main(int argc, char const *argv[]) {
+
 
     int* integer = my_malloc(sizeof(int));
     *integer = 10;
